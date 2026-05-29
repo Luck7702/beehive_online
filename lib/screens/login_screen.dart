@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -8,45 +9,63 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _nimController = TextEditingController();
+  final _emailPhoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _handleLogin() async {
+    if (_emailPhoneController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final success = await ApiService.login(_emailPhoneController.text, _passwordController.text);
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    
+    if (success) {
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Login failed')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 60),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F3F4), // Light gray container
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(Icons.bolt, size: 36, color: Theme.of(context).primaryColor),
-              ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
               const Text(
-                'Welcome Back',
+                'Hello',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Sign in to order straight to your classroom.',
+                'Please enter your details to log in.',
                 style: TextStyle(color: Colors.black54, fontSize: 15, height: 1.4),
               ),
               const SizedBox(height: 40),
               
               TextField(
-                controller: _nimController,
+                controller: _emailPhoneController,
                 style: const TextStyle(fontSize: 15, color: Colors.black87),
                 decoration: InputDecoration(
-                  hintText: 'NIM / Student ID',
-                  hintStyle: const TextStyle(color: Colors.black38),
+                  labelText: 'Email or Phone Number',
+                  labelStyle: const TextStyle(color: Colors.black54),
                   filled: true,
                   fillColor: const Color(0xFFF1F3F4),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -59,8 +78,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: true,
                 style: const TextStyle(fontSize: 15, color: Colors.black87),
                 decoration: InputDecoration(
-                  hintText: 'Password',
-                  hintStyle: const TextStyle(color: Colors.black38),
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(color: Colors.black54),
                   filled: true,
                   fillColor: const Color(0xFFF1F3F4),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -72,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+                  onPressed: _isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
@@ -80,7 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
-                  child: const Text('Sign In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: _isLoading 
+                      ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Text('Log In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

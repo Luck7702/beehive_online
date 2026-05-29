@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import '../models/product.dart';
+import '../services/api_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Dummy product list mapped from your MySQL inventory schema seeds
-    final List<Map<String, dynamic>> products = [
-      {'name': 'Es Kopi Susu Aren', 'price': 'Rp 15.000', 'category': 'Drink'},
-      {'name': 'Chitato Sapi Panggang', 'price': 'Rp 11.000', 'category': 'Snack'},
-      {'name': 'Teh Botol Sosro', 'price': 'Rp 6.000', 'category': 'Drink'},
-      {'name': 'Roti Kasur Cokelat', 'price': 'Rp 12.000', 'category': 'Food'},
-    ];
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  late Future<List<Product>> _productsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = ApiService.getProducts();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('UniMart Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -75,59 +82,76 @@ class HomeScreen extends StatelessWidget {
             const Text('Available Products', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
 
-            // Product Grid
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final prod = products[index];
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A2A),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.fastfood_outlined, size: 40, color: Colors.grey),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(prod['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                        const SizedBox(height: 4),
-                        Text(prod['price']!, style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Added ${prod['name']} to cart')),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2A2A2A),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                            ),
-                            child: const Text('Add to Cart', style: TextStyle(fontSize: 12)),
-                          ),
-                        )
-                      ],
-                    ),
+            // FutureBuilder for Products
+            FutureBuilder<List<Product>>(
+              future: _productsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: CircularProgressIndicator(),
+                  ));
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No products available'));
+                }
+
+                final products = snapshot.data!;
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.8,
                   ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final prod = products[index];
+                    return Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF2A2A2A),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.fastfood_outlined, size: 40, color: Colors.grey),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(prod.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            const SizedBox(height: 4),
+                            Text(prod.price, style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Added ${prod.name} to cart')),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF2A2A2A),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                ),
+                                child: const Text('Add to Cart', style: TextStyle(fontSize: 12)),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

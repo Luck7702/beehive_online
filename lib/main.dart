@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
@@ -29,9 +31,11 @@ class CampusMinimartApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      initialRoute: '/login',
+      initialRoute: '/welcome',
       routes: {
-        '/login': (context) => const LoginScreen(),
+        '/welcome': (context) => const WelcomeScreen(),
+        '/login_form': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
         '/home': (context) => const HomeScreen(),
         '/cart': (context) => const CartScreen(),
         '/checkout': (context) => const CheckoutScreen(),
