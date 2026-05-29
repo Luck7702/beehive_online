@@ -37,12 +37,12 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF2A2A2A),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.3)),
+                border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.3)),
               ),
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('✨ Free Delivery This Week!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('✨ Free Delivery This Week!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                   SizedBox(height: 4),
                   Text('No minimum checkout order for any building floor.', style: TextStyle(color: Colors.grey)),
                 ],
@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                       label: Text(cat),
                       selected: isAll,
                       selectedColor: Theme.of(context).primaryColor,
-                      labelStyle: TextStyle(color: isAll ? Colors.black : Colors.white),
+                      labelStyle: TextStyle(color: isAll ? Colors.white : Colors.black87),
                     ),
                   );
                 }).toList(),
@@ -119,6 +119,7 @@ class HomeScreen extends StatelessWidget {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF2A2A2A),
+                              foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 4),
                             ),
                             child: const Text('Add to Cart', style: TextStyle(fontSize: 12)),

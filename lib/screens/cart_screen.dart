@@ -47,7 +47,7 @@ class CartScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Total Payment', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                    Text('Rp 26.000', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text('Rp 26.000', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -57,7 +57,7 @@ class CartScreen extends StatelessWidget {
                     onPressed: () => Navigator.pushNamed(context, '/checkout'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.black,
+                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
