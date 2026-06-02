@@ -7,10 +7,11 @@
 - [x] Configured MySQL database connection (`db.js`).
 - [ ] Awaiting git commit for Stage 1.
 
-## Stage 2: Backend Authentication & Orders API
-- [ ] Implement User Login/Register (JWT & bcrypt).
-- [ ] Implement Order creation endpoint (Insert into `orders` & `order_items`).
-- [ ] Implement Order retrieval for Worker Bulletin.
+## Stage 2: Backend Authentication & Orders API (Current)
+- [x] Implement User Login/Register (JWT & bcrypt).
+- [x] Implement Order creation endpoint (Insert into `orders` & `order_items`).
+- [x] Implement Order retrieval for Worker Bulletin.
+- [ ] Awaiting git commit for Stage 2.
 
 ## Stage 3: Flutter App UI & Integration
 - [ ] Setup Flutter project structure (Models, Services, Screens).
