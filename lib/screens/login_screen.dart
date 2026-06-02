@@ -20,14 +20,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     setState(() => _isLoading = true);
-    final success = await ApiService.login(_nimController.text, _passwordController.text);
+    final result = await ApiService.login(_nimController.text, _passwordController.text);
     if (!mounted) return;
     setState(() => _isLoading = false);
     
-    if (success) {
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    if (result['success'] == true) {
+      final role = result['role'];
+      if (role == 'worker') {
+        Navigator.pushNamedAndRemoveUntil(context, '/worker_bulletin', (route) => false);
+      } else {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Login failed')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Login failed. Check your NIM and password.')));
     }
   }
 

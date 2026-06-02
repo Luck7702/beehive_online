@@ -7,6 +7,7 @@ import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
+import 'screens/worker_bulletin_screen.dart';
 
 void main() {
   runApp(const CampusMinimartApp());
@@ -45,6 +46,7 @@ class CampusMinimartApp extends StatelessWidget {
           '/home': (context) => const HomeScreen(),
           '/cart': (context) => const CartScreen(),
           '/checkout': (context) => const CheckoutScreen(),
+          '/worker_bulletin': (context) => const WorkerBulletinScreen(),
         },
       ),
     );

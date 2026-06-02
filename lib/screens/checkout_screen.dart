@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import '../services/api_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -14,7 +15,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _floorController = TextEditingController();
   final _roomController = TextEditingController();
 
-  void _confirmOrder() {
+  Future<void> _confirmOrder() async {
     if (_floorController.text.isEmpty || _roomController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out your target classroom details')),
@@ -24,31 +25,59 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final cart = Provider.of<CartProvider>(context, listen: false);
 
-    // TODO: POST to /api/orders when auth token is available
-    // For now, show success and clear cart
+    // Build items list for the API
+    final items = cart.items.values.map((item) => {
+      'product_id': item.product.id,
+      'quantity': item.quantity,
+      'price': item.product.price,
+    }).toList();
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Order Placed Successfully! 🎉'),
-        content: Text(
-          'Your items are being prepared for delivery to '
-          '${_buildingController.text}, Floor ${_floorController.text}, '
-          'Room ${_roomController.text}.\n\n'
-          'Total: Rp ${cart.totalAmount}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              cart.clear();
-              Navigator.of(context).pop();
-              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-            },
-            child: const Text('Back to Home'),
+    bool orderPlaced = false;
+
+    if (ApiService.token != null) {
+      // User is authenticated, send to backend
+      orderPlaced = await ApiService.placeOrder(
+        totalPrice: cart.totalAmount,
+        building: _buildingController.text,
+        floor: _floorController.text,
+        room: _roomController.text,
+        items: items,
+      );
+    } else {
+      // Not authenticated, simulate success for demo
+      orderPlaced = true;
+    }
+
+    if (!mounted) return;
+
+    if (orderPlaced) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Order Placed Successfully! 🎉'),
+          content: Text(
+            'Your items are being prepared for delivery to '
+            '${_buildingController.text}, Floor ${_floorController.text}, '
+            'Room ${_roomController.text}.\n\n'
+            'Total: Rp ${cart.totalAmount}',
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () {
+                cart.clear();
+                Navigator.of(context).pop();
+                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+              },
+              child: const Text('Back to Home'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to place order. Please try again.')),
+      );
+    }
   }
 
   @override

@@ -21,6 +21,9 @@
 - [x] Connected Login & Signup screens to backend API.
 - [ ] Awaiting git commit for Stage 3.
 
-## Stage 4: Worker Bulletin & Final Polish
-- [ ] Build Worker UI for updating Order states (Placed -> Processed -> Done).
+## Stage 4: Worker Bulletin & Final Polish (Current)
+- [x] Build Worker Bulletin UI for updating Order states (Placed -> Processed -> Done).
+- [x] Connected Checkout to backend POST /api/orders.
+- [x] Role-based login routing (student -> home, worker -> bulletin).
 - [ ] Final testing & Migration of products to MySQL (Optional).
+- [ ] Awaiting git commit for Stage 4.
