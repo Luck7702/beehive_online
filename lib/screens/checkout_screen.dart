@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/cart_provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -13,32 +15,47 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _roomController = TextEditingController();
 
   void _confirmOrder() {
-    if (_floorController.text.isNotEmpty && _roomController.text.isNotEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Order Placed Successfully! 🎉'),
-          content: Text('Your items are being prepared for delivery to ${_buildingController.text}, Floor ${_floorController.text}, Room ${_roomController.text}.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-              },
-              child: const Text('Back to Home'),
-            ),
-          ],
-        ),
-      );
-    } else {
+    if (_floorController.text.isEmpty || _roomController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out your target classroom details')),
       );
+      return;
     }
+
+    final cart = Provider.of<CartProvider>(context, listen: false);
+
+    // TODO: POST to /api/orders when auth token is available
+    // For now, show success and clear cart
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Order Placed Successfully! 🎉'),
+        content: Text(
+          'Your items are being prepared for delivery to '
+          '${_buildingController.text}, Floor ${_floorController.text}, '
+          'Room ${_roomController.text}.\n\n'
+          'Total: Rp ${cart.totalAmount}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              cart.clear();
+              Navigator.of(context).pop();
+              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+            },
+            child: const Text('Back to Home'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context);
+    final cartItems = cart.items.values.toList();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Checkout Details'), backgroundColor: Colors.transparent, elevation: 0),
       body: SingleChildScrollView(
@@ -84,18 +101,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 32),
             const Text('Order Summary', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const Card(
-              margin: EdgeInsets.symmetric(vertical: 12),
+            Card(
+              margin: const EdgeInsets.symmetric(vertical: 12),
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    ...cartItems.map((item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(child: Text('${item.product.name} x${item.quantity}')),
+                          Text('Rp ${item.totalPrice}'),
+                        ],
+                      ),
+                    )),
+                    const Divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Items Subtotal'), Text('Rp 26.000')],
+                      children: [
+                        const Text('Items Subtotal', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Rp ${cart.totalAmount}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                    SizedBox(height: 8),
-                    Row(
+                    const SizedBox(height: 8),
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [Text('Delivery Fee'), Text('Rp 0', style: TextStyle(color: Colors.green))],
                     ),

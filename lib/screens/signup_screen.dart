@@ -9,29 +9,16 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final _nimController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _mobileController = TextEditingController();
-  final _dobController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _dobController.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
-  }
-
   Future<void> _handleSignup() async {
-    if (_fullNameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_nimController.text.isEmpty || _fullNameController.text.isEmpty || 
+        _emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill mandatory fields')));
       return;
     }
@@ -39,10 +26,10 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
     
     final userData = {
-      'full_name': _fullNameController.text,
+      'nim': _nimController.text,
+      'name': _fullNameController.text,
       'email': _emailController.text,
-      'mobile': _mobileController.text,
-      'dob': _dobController.text,
+      'phone_number': _mobileController.text,
       'password': _passwordController.text,
     };
     
@@ -51,9 +38,12 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = false);
     
     if (success) {
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account created! Please log in.')),
+      );
+      Navigator.pushReplacementNamed(context, '/login_form');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration failed')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registration failed. NIM or Email might already exist.')));
     }
   }
 
@@ -115,15 +105,10 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 30),
               
+              _buildTextField(controller: _nimController, label: 'Student ID (NIM)'),
               _buildTextField(controller: _fullNameController, label: 'Full Name'),
               _buildTextField(controller: _emailController, label: 'Email', keyboardType: TextInputType.emailAddress),
               _buildTextField(controller: _mobileController, label: 'Mobile Number', keyboardType: TextInputType.phone),
-              _buildTextField(
-                controller: _dobController,
-                label: 'Date of Birth',
-                readOnly: true,
-                onTap: () => _selectDate(context),
-              ),
               _buildTextField(controller: _passwordController, label: 'Set Password', obscureText: true),
               
               const SizedBox(height: 24),

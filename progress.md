@@ -13,11 +13,13 @@
 - [x] Implement Order retrieval for Worker Bulletin.
 - [ ] Awaiting git commit for Stage 2.
 
-## Stage 3: Flutter App UI & Integration
-- [ ] Setup Flutter project structure (Models, Services, Screens).
-- [ ] Build Menu Browsing Screen (fetching from `productlist.json`).
-- [ ] Build Local Cart logic.
-- [ ] Build Checkout & Location Input Screen.
+## Stage 3: Flutter App UI & Integration (Current)
+- [x] Setup Flutter project structure (Models, Services, Screens).
+- [x] Build Menu Browsing Screen (fetching from `productlist.json`).
+- [x] Build Local Cart logic (CartProvider with Provider).
+- [x] Build Checkout & Location Input Screen.
+- [x] Connected Login & Signup screens to backend API.
+- [ ] Awaiting git commit for Stage 3.
 
 ## Stage 4: Worker Bulletin & Final Polish
 - [ ] Build Worker UI for updating Order states (Placed -> Processed -> Done).

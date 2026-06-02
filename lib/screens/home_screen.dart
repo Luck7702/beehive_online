@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../services/api_service.dart';
+import '../providers/cart_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,10 +28,18 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined),
-            onPressed: () => Navigator.pushNamed(context, '/cart'),
-          )
+          Consumer<CartProvider>(
+            builder: (_, cart, ch) => Badge(
+              label: Text(cart.itemCount.toString()),
+              isLabelVisible: cart.itemCount > 0,
+              child: ch!,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.shopping_cart_outlined),
+              onPressed: () => Navigator.pushNamed(context, '/cart'),
+            ),
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
@@ -129,14 +139,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 8),
                             Text(prod.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                             const SizedBox(height: 4),
-                            Text(prod.price, style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.w600)),
+                            Text(prod.formattedPrice, style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.w600)),
                             const SizedBox(height: 8),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed: () {
+                                  Provider.of<CartProvider>(context, listen: false).addItem(prod);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Added ${prod.name} to cart')),
+                                    SnackBar(
+                                      content: Text('Added ${prod.name} to cart'),
+                                      duration: const Duration(seconds: 1),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(

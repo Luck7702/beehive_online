@@ -9,18 +9,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailPhoneController = TextEditingController();
+  final _nimController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
   Future<void> _handleLogin() async {
-    if (_emailPhoneController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_nimController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
 
     setState(() => _isLoading = true);
-    final success = await ApiService.login(_emailPhoneController.text, _passwordController.text);
+    final success = await ApiService.login(_nimController.text, _passwordController.text);
     if (!mounted) return;
     setState(() => _isLoading = false);
     
@@ -61,10 +61,10 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
               
               TextField(
-                controller: _emailPhoneController,
+                controller: _nimController,
                 style: const TextStyle(fontSize: 15, color: Colors.black87),
                 decoration: InputDecoration(
-                  labelText: 'Email or Phone Number',
+                  labelText: 'Student ID (NIM)',
                   labelStyle: const TextStyle(color: Colors.black54),
                   filled: true,
                   fillColor: const Color(0xFFF1F3F4),
