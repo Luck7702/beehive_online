@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Nasi Goreng Spesial",
+    "category": "makanan",
+    "price": 15000,
+    "stock": 50,
+    "description": "Nasi goreng dengan telur, sosis, dan ayam suwir.",
+    "image_url": "/imgs/1.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Es Teh Manis",
+    "category": "minuman",
+    "price": 4000,
+    "stock": 100,
+    "description": "Es teh manis segar pelepas dahaga.",
+    "image_url": "/imgs/2.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Indomie Telur Kornet",
+    "category": "makanan",
+    "price": 12000,
+    "stock": 30,
+    "description": "Indomie goreng dengan topping telur matang dan kornet sapi.",
+    "image_url": "/imgs/3.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Roti Bakar Coklat Keju",
+    "category": "snack",
+    "price": 10000,
+    "stock": 20,
+    "description": "Roti bakar dengan olesan selai coklat dan taburan keju parut.",
+    "image_url": "/imgs/4.jpg"
+  }
+]
