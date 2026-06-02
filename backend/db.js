@@ -5,7 +5,7 @@ const pool = mysql.createPool({
     port: 3306,
     user: 'root',
     password: '1304',
-    database: 'kantin_db', // Ensure this database is created in your MySQL server
+    database: 'BEEHIVE_ONLINE', // Ensure this database is created in your MySQL server
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

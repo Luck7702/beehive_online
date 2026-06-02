@@ -34,14 +34,13 @@ const authenticateToken = (req, res, next) => {
 // ============================
 // 1. PRODUCTS (JSON File)
 // ============================
-app.get('/api/products', (req, res) => {
+app.get('/api/products', async (req, res) => {
     try {
-        const productsData = fs.readFileSync(path.join(__dirname, 'productlist.json'), 'utf8');
-        const products = JSON.parse(productsData);
+        const [products] = await pool.query('SELECT * FROM products');
         res.json(products);
     } catch (err) {
-        console.error('Error reading productlist.json:', err);
-        res.status(500).json({ error: 'Failed to retrieve products' });
+        console.error('Error fetching products from database:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -180,6 +179,28 @@ app.put('/api/orders/:id/status', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to update order status' });
+    }
+});
+
+// ============================
+// 4. DEBUG/DEVELOPMENT ROUTES
+// ============================
+// DANGER: Backdoor to reset all user and order data for a fresh start.
+app.post('/api/debug/reset', async (req, res) => {
+    const connection = await pool.getConnection();
+    try {
+        await connection.query('SET FOREIGN_KEY_CHECKS = 0');
+        await connection.query('TRUNCATE TABLE order_items');
+        await connection.query('TRUNCATE TABLE orders');
+        await connection.query('TRUNCATE TABLE users');
+        await connection.query('SET FOREIGN_KEY_CHECKS = 1');
+        
+        res.json({ message: 'Database reset successful. Users, orders, and items have been cleared.' });
+    } catch (error) {
+        console.error('Reset error:', error);
+        res.status(500).json({ error: 'Failed to reset database' });
+    } finally {
+        connection.release();
     }
 });
 
