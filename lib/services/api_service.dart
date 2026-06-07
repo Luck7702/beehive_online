@@ -120,12 +120,13 @@ class ApiService {
   // ============================
   // PLACE ORDER (Student)
   // ============================
-  static Future<bool> placeOrder({
+  static Future<int?> placeOrder({
     required int totalPrice,
     required String building,
     required String floor,
     required String room,
     required List<Map<String, dynamic>> items,
+    required String paymentMethod,
   }) async {
     try {
       final response = await http.post(
@@ -137,9 +138,68 @@ class ApiService {
           'delivery_floor': floor,
           'delivery_room': room,
           'items': items,
+          'payment_method': paymentMethod,
         }),
       );
-      return response.statusCode == 201;
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return data['orderId'];
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ============================
+  // QRIS & HISTORY (Student)
+  // ============================
+  static Future<List<Map<String, dynamic>>> getOrderHistory() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/orders/history'),
+        headers: _authHeaders,
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching history: $e');
+      return [];
+    }
+  }
+
+  static Future<bool> uploadPaymentProof(int orderId, String filePath) async {
+    if (_token == null) return false;
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/orders/$orderId/payment-proof'),
+      );
+      request.headers['Authorization'] = 'Bearer $_token';
+      request.files.add(await http.MultipartFile.fromPath('proof', filePath));
+
+      var response = await request.send();
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error uploading proof: $e');
+      return false;
+    }
+  }
+
+  // ============================
+  // WORKER PAYMENT VERIFICATION
+  // ============================
+  static Future<bool> verifyPayment(int orderId, String status) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/orders/$orderId/verify'),
+        headers: _authHeaders,
+        body: json.encode({'status': status}), // 'verified' or 'failed'
+      );
+      return response.statusCode == 200;
     } catch (e) {
       return false;
     }
