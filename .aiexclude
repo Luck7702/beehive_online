@@ -1,0 +1,30 @@
+# Flutter build and tool directories
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Node.js dependencies
+node_modules/
+backend/node_modules/
+
+# IDE and environment files
+.idea/
+*.iml
+.vscode/
+
+# Native platform directories (usually not needed for AI context unless specifically debugging native code)
+android/
+ios/
+linux/
+macos/
+windows/
+web/
+
+# Version control
+.git/
+
+# Lock files (too large and not useful for logic context)
+pubspec.lock
+package-lock.json
+yarn.lock
