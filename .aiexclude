@@ -1,19 +1,27 @@
-# Flutter build and tool directories
+# ==========================
+# Build outputs & tool caches
+# ==========================
 build/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 
-# Node.js dependencies
+# ==========================
+# Dependencies (too large, no logic value)
+# ==========================
 node_modules/
-backend/node_modules/
+admin_web/node_modules/
 
-# IDE and environment files
+# ==========================
+# IDE config
+# ==========================
 .idea/
 *.iml
 .vscode/
 
-# Native platform directories (usually not needed for AI context unless specifically debugging native code)
+# ==========================
+# Native platform dirs (exclude unless debugging native code)
+# ==========================
 android/
 ios/
 linux/
@@ -21,10 +29,29 @@ macos/
 windows/
 web/
 
-# Version control
+# ==========================
+# Version control internals
+# ==========================
 .git/
 
-# Lock files (too large and not useful for logic context)
+# ==========================
+# Lock files (large, not useful for logic context)
+# ==========================
 pubspec.lock
 package-lock.json
 yarn.lock
+
+# ==========================
+# Secrets & environment
+# ==========================
+.env
+.env.*
+backend/.env
+backend/.env.*
+
+# ==========================
+# Generated / binary assets
+# ==========================
+admin_web/dist/
+admin_web/dist-ssr/
+*.local
