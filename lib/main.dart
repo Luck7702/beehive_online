@@ -7,9 +7,11 @@ import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/worker_bulletin_screen.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const CampusMinimartApp());
 }
 

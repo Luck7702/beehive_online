@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/product.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static String get baseUrl => '${dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:3000'}/api';
 
   // Store the JWT token after login
   static String? _token;

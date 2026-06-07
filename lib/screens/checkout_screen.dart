@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../providers/cart_provider.dart';
 import '../services/api_service.dart';
 
@@ -85,7 +86,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     const Text('Please scan the QR code below and upload your payment receipt.'),
                     const SizedBox(height: 16),
                     Image.network(
-                      'http://10.0.2.2:3000/imgs/qris.jpg', // 10.0.2.2 is localhost for Android Emulator
+                      '${dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:3000'}/imgs/qris.jpg', // 10.0.2.2 is localhost for Android Emulator
                       height: 200,
                       errorBuilder: (ctx, err, stack) => const Icon(Icons.qr_code, size: 100),
                     ),
