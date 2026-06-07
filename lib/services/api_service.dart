@@ -25,7 +25,8 @@ class ApiService {
   // ============================
   static Future<List<Product>> getProducts() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/products'));
+      final response = await http.get(Uri.parse('$baseUrl/products'))
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
@@ -48,7 +49,7 @@ class ApiService {
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'nim': nim, 'password': password}),
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -70,7 +71,7 @@ class ApiService {
         Uri.parse('$baseUrl/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(userData),
-      );
+      ).timeout(const Duration(seconds: 10));
       return response.statusCode == 201;
     } catch (e) {
       return false;

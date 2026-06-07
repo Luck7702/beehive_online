@@ -10,6 +10,7 @@ async function createAdmin() {
     const role = 'admin';
 
     try {
+        await pool.query("ALTER TABLE users MODIFY COLUMN role VARCHAR(20) NOT NULL DEFAULT 'student'");
         const hashedPassword = await bcrypt.hash(password, 10);
         await pool.query(
             `INSERT INTO users (nim, name, email, password, phone_number, role) 
