@@ -97,6 +97,22 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
     }
   }
 
+  Future<void> _verifyPayment(int orderId, String status) async {
+    final success = await ApiService.verifyPayment(orderId, status);
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Payment marked as $status')),
+      );
+      _refreshOrders();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update payment status')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,6 +168,7 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
           final orders = snapshot.data!;
 
           // Group orders by status for bulletin layout
+          final awaitingVerification = orders.where((o) => o['payment_status'] == 'awaiting_verification').toList();
           final placedOrders = orders.where((o) => o['order_status'] == 'placed').toList();
           final processedOrders = orders.where((o) => o['order_status'] == 'processed').toList();
           final doneOrders = orders.where((o) => o['order_status'] == 'done').toList();
@@ -172,6 +189,13 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
+
+                if (awaitingVerification.isNotEmpty) ...[
+                  _buildSectionHeader('🔍 Payment Verifications', awaitingVerification.length),
+                  const SizedBox(height: 8),
+                  ...awaitingVerification.map((o) => _buildVerificationCard(o)),
+                  const SizedBox(height: 24),
+                ],
 
                 if (placedOrders.isNotEmpty) ...[
                   _buildSectionHeader('📋 New Orders', placedOrders.length),
@@ -224,6 +248,58 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
     return Text(
       '$title ($count)',
       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildVerificationCard(Map<String, dynamic> order) {
+    final orderId = order['id'] as int;
+    final studentName = order['student_name'] ?? 'Unknown';
+    final proofUrl = order['payment_proof_url'];
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Verify QRIS Payment - Order #$orderId', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            Text('From: $studentName', style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 16),
+            if (proofUrl != null)
+              Center(
+                child: Image.network(
+                  proofUrl,
+                  height: 150,
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, err, stack) => const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                ),
+              ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _verifyPayment(orderId, 'failed'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade100, foregroundColor: Colors.red),
+                    child: const Text('Reject'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _verifyPayment(orderId, 'verified'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    child: const Text('Approve'),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
 
