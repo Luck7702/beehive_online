@@ -9,7 +9,7 @@ CREATE TABLE users (
     email         VARCHAR(100) NOT NULL UNIQUE,
     password      VARCHAR(255) NOT NULL,  -- hashed (bcrypt/argon2)
     phone_number  VARCHAR(20),
-    role          VARCHAR(20)  NOT NULL DEFAULT 'student', -- 'student' or 'worker'
+    role          VARCHAR(20)  NOT NULL DEFAULT 'student', -- 'student', 'worker', or 'admin'
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -33,9 +33,11 @@ CREATE TABLE orders (
     delivery_room            VARCHAR(20)  NOT NULL,
     order_status             VARCHAR(20)  NOT NULL DEFAULT 'placed',
     -- order_status: placed | processed | done | cancelled
-    payment_status           VARCHAR(20)  NOT NULL DEFAULT 'unpaid',
-    -- payment_status: unpaid | paid | failed | refunded
-    midtrans_transaction_id  VARCHAR(100) UNIQUE,
+    payment_method           VARCHAR(20)  NOT NULL DEFAULT 'COD',
+    -- payment_method: COD | QRIS
+    payment_status           VARCHAR(30)  NOT NULL DEFAULT 'pending',
+    -- payment_status: pending | awaiting_verification | verified | failed
+    payment_proof_url        VARCHAR(255),
     created_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
