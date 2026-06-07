@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '../providers/cart_provider.dart';
 import '../services/api_service.dart';
 
@@ -14,6 +15,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _buildingController = TextEditingController(text: 'Main Tower');
   final _floorController = TextEditingController();
   final _roomController = TextEditingController();
+  
+  String _paymentMethod = 'COD';
+  bool _isLoading = false;
 
   Future<void> _confirmOrder() async {
     if (_floorController.text.isEmpty || _roomController.text.isEmpty) {
@@ -24,60 +28,140 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     final cart = Provider.of<CartProvider>(context, listen: false);
-
-    // Build items list for the API
     final items = cart.items.values.map((item) => {
       'product_id': item.product.id,
       'quantity': item.quantity,
       'price': item.product.price,
     }).toList();
 
-    bool orderPlaced = false;
+    setState(() => _isLoading = true);
 
+    int? orderId;
     if (ApiService.token != null) {
-      // User is authenticated, send to backend
-      orderPlaced = await ApiService.placeOrder(
+      orderId = await ApiService.placeOrder(
         totalPrice: cart.totalAmount,
         building: _buildingController.text,
         floor: _floorController.text,
         room: _roomController.text,
         items: items,
+        paymentMethod: _paymentMethod,
       );
     } else {
-      // Not authenticated, simulate success for demo
-      orderPlaced = true;
+      // Not authenticated demo
+      orderId = 999;
     }
+
+    setState(() => _isLoading = false);
 
     if (!mounted) return;
 
-    if (orderPlaced) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Order Placed Successfully! 🎉'),
-          content: Text(
-            'Your items are being prepared for delivery to '
-            '${_buildingController.text}, Floor ${_floorController.text}, '
-            'Room ${_roomController.text}.\n\n'
-            'Total: Rp ${cart.totalAmount}',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                cart.clear();
-                Navigator.of(context).pop();
-                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-              },
-              child: const Text('Back to Home'),
-            ),
-          ],
-        ),
-      );
+    if (orderId != null) {
+      if (_paymentMethod == 'QRIS') {
+        _showQrisUploadDialog(orderId, cart);
+      } else {
+        _showSuccessDialog(cart);
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to place order. Please try again.')),
       );
     }
+  }
+
+  void _showQrisUploadDialog(int orderId, CartProvider cart) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        bool uploading = false;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Complete QRIS Payment'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Please scan the QR code below and upload your payment receipt.'),
+                    const SizedBox(height: 16),
+                    Image.network(
+                      'http://10.0.2.2:3000/imgs/qris.jpg', // 10.0.2.2 is localhost for Android Emulator
+                      height: 200,
+                      errorBuilder: (ctx, err, stack) => const Icon(Icons.qr_code, size: 100),
+                    ),
+                    const SizedBox(height: 16),
+                    Text('Total Amount: Rp ${cart.totalAmount}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 16),
+                    if (uploading) const CircularProgressIndicator(),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: uploading ? null : () {
+                    // They canceled upload, order is stuck at pending
+                    cart.clear();
+                    Navigator.pop(context);
+                    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                  },
+                  child: const Text('Do it Later'),
+                ),
+                ElevatedButton(
+                  onPressed: uploading ? null : () async {
+                    final ImagePicker picker = ImagePicker();
+                    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                    
+                    if (image != null) {
+                      setState(() => uploading = true);
+                      bool success = await ApiService.uploadPaymentProof(orderId, image.path);
+                      setState(() => uploading = false);
+                      
+                      if (success) {
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
+                        _showSuccessDialog(cart);
+                      } else {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Failed to upload proof.')),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text('Upload Receipt'),
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(CartProvider cart) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Order Placed Successfully! 🎉'),
+        content: Text(
+          'Your items are being prepared for delivery to '
+          '${_buildingController.text}, Floor ${_floorController.text}, '
+          'Room ${_roomController.text}.\n\n'
+          'Total: Rp ${cart.totalAmount}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              cart.clear();
+              Navigator.of(context).pop();
+              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+            },
+            child: const Text('Back to Home'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -129,6 +213,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ],
             ),
             const SizedBox(height: 32),
+            const Text('Payment Method', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  RadioListTile<String>(
+                    title: const Text('Cash on Delivery (COD)'),
+                    value: 'COD',
+                    groupValue: _paymentMethod,
+                    onChanged: (value) => setState(() => _paymentMethod = value!),
+                  ),
+                  const Divider(height: 1),
+                  RadioListTile<String>(
+                    title: const Text('QRIS'),
+                    value: 'QRIS',
+                    groupValue: _paymentMethod,
+                    onChanged: (value) => setState(() => _paymentMethod = value!),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
             const Text('Order Summary', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Card(
               margin: const EdgeInsets.symmetric(vertical: 12),
@@ -154,11 +264,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         Text('Rp ${cart.totalAmount}', style: const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Delivery Fee'), Text('Rp 0', style: TextStyle(color: Colors.green))],
-                    ),
                   ],
                 ),
               ),
@@ -167,14 +272,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _confirmOrder,
+                onPressed: _isLoading ? null : _confirmOrder,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('Place Order (Cash on Delivery)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: _isLoading 
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text('Place Order ($_paymentMethod)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ),
           ],
