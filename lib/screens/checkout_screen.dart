@@ -29,7 +29,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     final cart = Provider.of<CartProvider>(context, listen: false);
-    final items = cart.items.values.map((item) => {
+    final items = cart.items.values.map((item) => <String, dynamic>{
       'product_id': item.product.id,
       'quantity': item.quantity,
       'price': item.product.price,
