@@ -6,7 +6,8 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const pool = require('./db');
 
 const app = express();
@@ -22,7 +23,50 @@ const s3Client = new S3Client({
     }
 });
 const S3_BUCKET = process.env.AWS_S3_BUCKET || 'beehive-payment-proofs';
+const S3_REGION = process.env.AWS_REGION || 'ap-southeast-1';
+// How long (seconds) a presigned payment-proof link stays valid. Default 1 hour.
+const PROOF_URL_EXPIRY = parseInt(process.env.AWS_PROOF_URL_EXPIRY || '3600', 10);
 const upload = multer({ storage: multer.memoryStorage() });
+
+// The payment-proofs bucket is kept PRIVATE (no public access). We store the S3
+// object key in the DB and hand out short-lived presigned URLs only to the
+// authenticated student who owns the order and to workers verifying it.
+//
+// `stored` may be a bare key (new uploads) or a legacy full https URL — handle both.
+function proofKeyFromStored(stored) {
+    if (!stored) return null;
+    if (stored.startsWith('http')) {
+        try {
+            return decodeURIComponent(new URL(stored).pathname.replace(/^\//, ''));
+        } catch (_) {
+            return null;
+        }
+    }
+    return stored;
+}
+
+async function presignProof(stored) {
+    const key = proofKeyFromStored(stored);
+    if (!key) return null;
+    try {
+        return await getSignedUrl(
+            s3Client,
+            new GetObjectCommand({ Bucket: S3_BUCKET, Key: key }),
+            { expiresIn: PROOF_URL_EXPIRY }
+        );
+    } catch (err) {
+        console.error('Failed to presign payment proof:', err);
+        return null;
+    }
+}
+
+// Replace each order's stored proof key with a presigned, viewable URL.
+async function attachProofUrls(orders) {
+    return Promise.all(orders.map(async (o) => ({
+        ...o,
+        payment_proof_url: await presignProof(o.payment_proof_url),
+    })));
+}
 
 // Middleware
 app.use(cors());
@@ -163,7 +207,7 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
              LEFT JOIN users u ON o.user_id = u.id 
              ORDER BY o.created_at DESC`
         );
-        res.json(orders);
+        res.json(await attachProofUrls(orders));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch orders' });
@@ -177,7 +221,7 @@ app.get('/api/orders/history', authenticateToken, async (req, res) => {
             'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
             [req.user.id]
         );
-        res.json(orders);
+        res.json(await attachProofUrls(orders));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch order history' });
@@ -194,7 +238,8 @@ app.post('/api/orders/:orderId/payment-proof', authenticateToken, upload.single(
     }
 
     try {
-        const fileKey = `payment-proofs/order_${orderId}_${Date.now()}.jpg`;
+        const ext = (file.mimetype && file.mimetype.split('/')[1]) || 'jpg';
+        const fileKey = `payment-proofs/order_${orderId}_${Date.now()}.${ext}`;
         const uploadParams = {
             Bucket: S3_BUCKET,
             Key: fileKey,
@@ -204,18 +249,17 @@ app.post('/api/orders/:orderId/payment-proof', authenticateToken, upload.single(
 
         await s3Client.send(new PutObjectCommand(uploadParams));
 
-        const proofUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION || 'ap-southeast-1'}.amazonaws.com/${fileKey}`;
-
+        // Store only the object key; the bucket stays private and we presign on read.
         const [result] = await pool.query(
             'UPDATE orders SET payment_status = ?, payment_proof_url = ? WHERE id = ? AND user_id = ?',
-            ['awaiting_verification', proofUrl, orderId, req.user.id]
+            ['awaiting_verification', fileKey, orderId, req.user.id]
         );
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Order not found or unauthorized' });
         }
 
-        res.json({ message: 'Payment proof uploaded successfully', url: proofUrl });
+        res.json({ message: 'Payment proof uploaded successfully', url: await presignProof(fileKey) });
     } catch (error) {
         console.error('S3 Upload Error:', error);
         res.status(500).json({ error: 'Failed to upload payment proof' });

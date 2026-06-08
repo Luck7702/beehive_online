@@ -113,6 +113,51 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
     }
   }
 
+  void _showProofFullScreen(String proofUrl, int orderId) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: const EdgeInsets.all(12),
+        child: Stack(
+          children: [
+            InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4,
+              child: Center(
+                child: Image.network(
+                  proofUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (ctx, child, progress) => progress == null
+                      ? child
+                      : const SizedBox(height: 200, child: Center(child: CircularProgressIndicator())),
+                  errorBuilder: (ctx, err, stack) => const Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Icon(Icons.broken_image, size: 64, color: Colors.white54),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 4,
+              right: 4,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            Positioned(
+              bottom: 8,
+              left: 12,
+              child: Text('Order #$orderId payment proof',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -270,12 +315,31 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
             const SizedBox(height: 16),
             if (proofUrl != null)
               Center(
-                child: Image.network(
-                  proofUrl,
-                  height: 150,
-                  fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) => const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                child: GestureDetector(
+                  onTap: () => _showProofFullScreen(proofUrl, orderId),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      proofUrl,
+                      height: 150,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (ctx, child, progress) => progress == null
+                          ? child
+                          : const SizedBox(height: 150, child: Center(child: CircularProgressIndicator())),
+                      errorBuilder: (ctx, err, stack) => const SizedBox(
+                        height: 150,
+                        child: Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey)),
+                      ),
+                    ),
+                  ),
                 ),
+              )
+            else
+              const Text('No payment proof uploaded yet.', style: TextStyle(color: Colors.grey)),
+            if (proofUrl != null)
+              const Padding(
+                padding: EdgeInsets.only(top: 6),
+                child: Text('Tap receipt to enlarge', style: TextStyle(fontSize: 11, color: Colors.grey)),
               ),
             const SizedBox(height: 16),
             Row(
