@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
 
-/// The BeeHive brand mark: a clean round honey badge with the hive glyph and a
-/// soft warm shadow. Scales cleanly, so the same widget serves the large welcome
-/// hero and the small auth headers.
+/// The BeeHive brand mark: a round blue badge with the honeycomb (hive) glyph in
+/// honey yellow and a soft blue shadow. Scales cleanly, so the same widget serves
+/// the large welcome hero and the small auth headers.
 class BeehiveLogo extends StatelessWidget {
   final double size;
 
@@ -15,21 +15,21 @@ class BeehiveLogo extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        gradient: BeehiveColors.honeyGradient,
+        color: BeehiveColors.blue,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFF59E0B).withValues(alpha: 0.40),
-            blurRadius: size * 0.28,
-            offset: Offset(0, size * 0.12),
+            color: BeehiveColors.blue.withValues(alpha: 0.30),
+            blurRadius: size * 0.22,
+            offset: Offset(0, size * 0.08),
           ),
         ],
       ),
       alignment: Alignment.center,
       child: Icon(
         Icons.hive_rounded,
-        size: size * 0.5,
-        color: const Color(0xFF5A3A0E), // dark honey-brown for a bee-like contrast
+        size: size * 0.54,
+        color: BeehiveColors.yellow,
       ),
     );
   }

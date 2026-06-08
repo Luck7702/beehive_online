@@ -23,13 +23,6 @@ class BeehiveColors {
     end: Alignment.bottomRight,
   );
 
-  /// Warm honey gradient used by the brand logo.
-  static const LinearGradient honeyGradient = LinearGradient(
-    colors: [Color(0xFFFFD24D), Color(0xFFF59E0B)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
   /// Soft, diffuse shadow that lifts cards and buttons gently off the page.
   static const List<BoxShadow> softShadow = [
     BoxShadow(color: Color(0x12101828), blurRadius: 18, offset: Offset(0, 8)),
