@@ -1,38 +1,22 @@
 [
-  {
-    "id": 1,
-    "name": "Nasi Goreng Spesial",
-    "category": "makanan",
-    "price": 15000,
-    "stock": 50,
-    "description": "Nasi goreng dengan telur, sosis, dan ayam suwir.",
-    "image_url": "/imgs/1.jpg"
-  },
-  {
-    "id": 2,
-    "name": "Es Teh Manis",
-    "category": "minuman",
-    "price": 4000,
-    "stock": 100,
-    "description": "Es teh manis segar pelepas dahaga.",
-    "image_url": "/imgs/2.jpg"
-  },
-  {
-    "id": 3,
-    "name": "Indomie Telur Kornet",
-    "category": "makanan",
-    "price": 12000,
-    "stock": 30,
-    "description": "Indomie goreng dengan topping telur matang dan kornet sapi.",
-    "image_url": "/imgs/3.jpg"
-  },
-  {
-    "id": 4,
-    "name": "Roti Bakar Coklat Keju",
-    "category": "snack",
-    "price": 10000,
-    "stock": 20,
-    "description": "Roti bakar dengan olesan selai coklat dan taburan keju parut.",
-    "image_url": "/imgs/4.jpg"
-  }
+  { "id": 1,  "name": "Teh Pucuk Harum 350ml",      "category": "minuman",    "price": 4000,  "stock": 100, "description": "Teh melati segar dalam kemasan botol.",             "image_url": "/imgs/teh_pucuk.jpg" },
+  { "id": 2,  "name": "Aqua 600ml",                 "category": "minuman",    "price": 3500,  "stock": 150, "description": "Air mineral pegunungan berkualitas.",               "image_url": "/imgs/aqua.jpg" },
+  { "id": 3,  "name": "Ultra Milk Cokelat 250ml",   "category": "minuman",    "price": 6500,  "stock": 80,  "description": "Susu UHT rasa cokelat, praktis diminum.",           "image_url": "/imgs/ultra_milk.jpg" },
+  { "id": 4,  "name": "Kopiko 78 Coffee Latte",     "category": "minuman",    "price": 8000,  "stock": 70,  "description": "Kopi latte siap minum untuk teman begadang.",       "image_url": "/imgs/kopiko78.jpg" },
+  { "id": 5,  "name": "Le Minerale 600ml",          "category": "minuman",    "price": 4000,  "stock": 150, "description": "Air mineral dengan kemasan praktis.",               "image_url": "/imgs/le_minerale.jpg" },
+  { "id": 6,  "name": "Nasi Uduk Box",              "category": "makanan",    "price": 12000, "stock": 40,  "description": "Nasi uduk praktis dalam kemasan box, siap santap.", "image_url": "/imgs/nasi_uduk.jpg" },
+  { "id": 7,  "name": "Bakpao Ayam",                "category": "makanan",    "price": 8000,  "stock": 50,  "description": "Bakpao lembut dengan isian ayam.",                  "image_url": "/imgs/bakpao.jpg" },
+  { "id": 8,  "name": "Pop Mie Rasa Baso",          "category": "makanan",    "price": 6000,  "stock": 90,  "description": "Mi instan cup rasa baso, tinggal seduh.",           "image_url": "/imgs/popmie.jpg" },
+  { "id": 9,  "name": "Roti Coklat Sari Roti",      "category": "makanan",    "price": 8500,  "stock": 60,  "description": "Roti isi krim cokelat, cocok untuk sarapan cepat.", "image_url": "/imgs/roti_coklat.jpg" },
+  { "id": 10, "name": "Chitato Sapi Panggang",      "category": "snack",      "price": 11000, "stock": 80,  "description": "Keripik kentang renyah rasa sapi panggang.",        "image_url": "/imgs/chitato.jpg" },
+  { "id": 11, "name": "Silverqueen Milk Chocolate", "category": "snack",      "price": 14000, "stock": 60,  "description": "Cokelat susu dengan kacang mete.",                  "image_url": "/imgs/silverqueen.jpg" },
+  { "id": 12, "name": "Roti Bakar Coklat Keju",     "category": "snack",      "price": 10000, "stock": 40,  "description": "Roti bakar selai cokelat dengan taburan keju.",     "image_url": "/imgs/roti_bakar.jpg" },
+  { "id": 13, "name": "Beng-Beng Share It",         "category": "snack",      "price": 12000, "stock": 70,  "description": "Wafer cokelat karamel ukuran berbagi.",             "image_url": "/imgs/bengbeng.jpg" },
+  { "id": 14, "name": "Oreo Vanilla 133g",          "category": "snack",      "price": 9500,  "stock": 75,  "description": "Biskuit sandwich dengan krim vanila.",              "image_url": "/imgs/oreo.jpg" },
+  { "id": 15, "name": "Tissue Paseo Smart 250s",    "category": "essentials", "price": 15000, "stock": 50,  "description": "Tisu wajah lembut, isi 250 lembar.",                "image_url": "/imgs/tissue.jpg" },
+  { "id": 16, "name": "Pulpen Snowman V-1 Black",   "category": "essentials", "price": 3500,  "stock": 120, "description": "Pulpen tinta hitam untuk catatan kuliah.",          "image_url": "/imgs/pulpen.jpg" },
+  { "id": 17, "name": "Pensil 2B Faber Castell",    "category": "essentials", "price": 5000,  "stock": 120, "description": "Pensil 2B untuk ujian dan menggambar.",             "image_url": "/imgs/pensil.jpg" },
+  { "id": 18, "name": "Rexona Men Roll On",         "category": "essentials", "price": 18000, "stock": 40,  "description": "Deodoran roll-on tahan lama.",                      "image_url": "/imgs/rexona.jpg" },
+  { "id": 19, "name": "Buku Tulis Sinar Dunia 38",  "category": "essentials", "price": 4500,  "stock": 100, "description": "Buku tulis 38 lembar untuk catatan kuliah.",        "image_url": "/imgs/buku_tulis.jpg" },
+  { "id": 20, "name": "Penggaris Butterfly 30cm",   "category": "essentials", "price": 4000,  "stock": 80,  "description": "Penggaris plastik 30 cm bening.",                   "image_url": "/imgs/penggaris.jpg" }
 ]
