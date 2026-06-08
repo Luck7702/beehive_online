@@ -55,9 +55,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _orders.isEmpty
-              ? const Center(child: Text('No past orders found.'))
+          : RefreshIndicator(
+              onRefresh: _fetchHistory,
+              child: _orders.isEmpty
+              ? ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: const [
+                    SizedBox(height: 120),
+                    Center(child: Text('No past orders found.')),
+                  ],
+                )
               : ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   itemCount: _orders.length,
                   itemBuilder: (context, index) {
@@ -116,6 +125,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     );
                   },
                 ),
+            ),
     );
   }
 }

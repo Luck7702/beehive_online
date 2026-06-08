@@ -65,9 +65,9 @@ class CartScreen extends StatelessWidget {
                         child: Card(
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Color(0xFF2A2A2A),
-                              child: Icon(Icons.fastfood, color: Colors.white),
+                            leading: CircleAvatar(
+                              backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                              child: Icon(Icons.fastfood, color: Theme.of(context).primaryColor),
                             ),
                             title: Text(item.product.name),
                             subtitle: Text(item.product.formattedPrice),
@@ -93,9 +93,16 @@ class CartScreen extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, -2),
+                ),
+              ],
             ),
             child: Column(
               children: [
@@ -103,7 +110,7 @@ class CartScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Total Payment', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                    Text('Rp ${cart.totalAmount}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                    Text('Rp ${cart.totalAmount}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
                   ],
                 ),
                 const SizedBox(height: 16),

@@ -221,22 +221,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Column(
-                children: [
-                  RadioListTile<String>(
-                    title: const Text('Cash on Delivery (COD)'),
-                    value: 'COD',
-                    groupValue: _paymentMethod,
-                    onChanged: (value) => setState(() => _paymentMethod = value!),
-                  ),
-                  const Divider(height: 1),
-                  RadioListTile<String>(
-                    title: const Text('QRIS'),
-                    value: 'QRIS',
-                    groupValue: _paymentMethod,
-                    onChanged: (value) => setState(() => _paymentMethod = value!),
-                  ),
-                ],
+              child: RadioGroup<String>(
+                groupValue: _paymentMethod,
+                onChanged: (value) => setState(() => _paymentMethod = value!),
+                child: const Column(
+                  children: [
+                    RadioListTile<String>(
+                      title: Text('Cash on Delivery (COD)'),
+                      value: 'COD',
+                    ),
+                    Divider(height: 1),
+                    RadioListTile<String>(
+                      title: Text('QRIS'),
+                      value: 'QRIS',
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 32),

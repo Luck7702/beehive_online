@@ -9,6 +9,7 @@ import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/worker_bulletin_screen.dart';
+import 'screens/order_history_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +51,7 @@ class CampusMinimartApp extends StatelessWidget {
           '/cart': (context) => const CartScreen(),
           '/checkout': (context) => const CheckoutScreen(),
           '/worker_bulletin': (context) => const WorkerBulletinScreen(),
+          '/order_history': (context) => const OrderHistoryScreen(),
         },
       ),
     );

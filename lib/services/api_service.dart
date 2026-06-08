@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/product.dart';
@@ -35,7 +36,7 @@ class ApiService {
         throw Exception('Failed to load products');
       }
     } catch (e) {
-      print('Error fetching products: $e');
+      debugPrint('Error fetching products: $e');
       throw Exception('Failed to connect to the backend: $e');
     }
   }
@@ -101,7 +102,7 @@ class ApiService {
         throw Exception('Failed to load orders');
       }
     } catch (e) {
-      print('Error fetching orders: $e');
+      debugPrint('Error fetching orders: $e');
       throw Exception('Failed to fetch orders: $e');
     }
   }
@@ -168,7 +169,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error fetching history: $e');
+      debugPrint('Error fetching history: $e');
       return [];
     }
   }
@@ -186,7 +187,7 @@ class ApiService {
       var response = await request.send();
       return response.statusCode == 200;
     } catch (e) {
-      print('Error uploading proof: $e');
+      debugPrint('Error uploading proof: $e');
       return false;
     }
   }
