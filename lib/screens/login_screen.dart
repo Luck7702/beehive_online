@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Login failed. Check your NIM and password.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Login failed. Check your ID and password.')));
     }
   }
 
@@ -69,7 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _nimController,
                 style: const TextStyle(fontSize: 15, color: Colors.black87),
                 decoration: InputDecoration(
-                  labelText: 'Student ID (NIM)',
+                  labelText: 'NIM / Worker ID',
+                  hintText: 'Students: NIM   •   Workers: your ID',
                   labelStyle: const TextStyle(color: Colors.black54),
                   filled: true,
                   fillColor: const Color(0xFFF1F3F4),
