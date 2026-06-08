@@ -294,6 +294,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildProductImage(String? url) {
+    const fallback = Center(
+      child: Icon(Icons.fastfood_outlined, size: 40, color: BeehiveColors.blue),
+    );
+    if (url == null) return fallback;
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      loadingBuilder: (ctx, child, progress) => progress == null
+          ? child
+          : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      errorBuilder: (ctx, err, stack) => fallback,
+    );
+  }
+
   Widget _buildProductCard(Product prod) {
     return Card(
       child: Padding(
@@ -304,11 +319,12 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Container(
                 width: double.infinity,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   color: BeehiveColors.blueTint,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.fastfood_outlined, size: 40, color: BeehiveColors.blue),
+                child: _buildProductImage(ApiService.imageUrl(prod.imageUrl)),
               ),
             ),
             const SizedBox(height: 8),

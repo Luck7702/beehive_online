@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme.dart';
 import '../providers/cart_provider.dart';
+import '../services/api_service.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -66,9 +67,14 @@ class CartScreen extends StatelessWidget {
                         child: Card(
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: ListTile(
-                            leading: const CircleAvatar(
+                            leading: CircleAvatar(
                               backgroundColor: BeehiveColors.blueTint,
-                              child: Icon(Icons.fastfood, color: BeehiveColors.blue),
+                              backgroundImage: ApiService.imageUrl(item.product.imageUrl) != null
+                                  ? NetworkImage(ApiService.imageUrl(item.product.imageUrl)!)
+                                  : null,
+                              child: ApiService.imageUrl(item.product.imageUrl) == null
+                                  ? const Icon(Icons.fastfood, color: BeehiveColors.blue)
+                                  : null,
                             ),
                             title: Text(item.product.name),
                             subtitle: Text(item.product.formattedPrice, style: const TextStyle(color: BeehiveColors.blue, fontWeight: FontWeight.w600)),

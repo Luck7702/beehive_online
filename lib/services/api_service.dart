@@ -5,7 +5,16 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/product.dart';
 
 class ApiService {
-  static String get baseUrl => '${dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:3000'}/api';
+  static String get _host => dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:3000';
+  static String get baseUrl => '$_host/api';
+
+  /// Builds a full URL for a product image whose stored path is like '/imgs/aqua.jpg'.
+  /// Returns null when there is no usable path (caller shows an icon fallback).
+  static String? imageUrl(String? path) {
+    if (path == null || path.isEmpty) return null;
+    if (path.startsWith('http')) return path;
+    return '$_host${path.startsWith('/') ? '' : '/'}$path';
+  }
 
   // Store the JWT token after login
   static String? _token;
