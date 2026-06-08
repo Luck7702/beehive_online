@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -73,7 +74,7 @@ app.post('/api/auth/register', async (req, res) => {
     } catch (error) {
         console.error(error);
         if (error.code === 'ER_DUP_ENTRY') {
-            res.status(400).json({ error: 'NIM or Email already exists' });
+            res.status(400).json({ error: 'Account ID or Email already exists' });
         } else {
             res.status(500).json({ error: 'Internal server error' });
         }
@@ -298,7 +299,7 @@ app.post('/api/admin/users', authenticateToken, async (req, res) => {
         res.status(201).json({ message: 'User created successfully', userId: result.insertId });
     } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
-            res.status(400).json({ error: 'NIM or Email already exists' });
+            res.status(400).json({ error: 'Account ID or Email already exists' });
         } else {
             res.status(500).json({ error: 'Internal server error' });
         }
@@ -321,23 +322,26 @@ app.get('/api/admin/users', authenticateToken, async (req, res) => {
 // 4. DEBUG/DEVELOPMENT ROUTES
 // ============================
 // DANGER: Backdoor to reset all user and order data for a fresh start.
-app.post('/api/debug/reset', async (req, res) => {
-    const connection = await pool.getConnection();
-    try {
-        await connection.query('SET FOREIGN_KEY_CHECKS = 0');
-        await connection.query('TRUNCATE TABLE order_items');
-        await connection.query('TRUNCATE TABLE orders');
-        await connection.query('TRUNCATE TABLE users');
-        await connection.query('SET FOREIGN_KEY_CHECKS = 1');
-        
-        res.json({ message: 'Database reset successful. Users, orders, and items have been cleared.' });
-    } catch (error) {
-        console.error('Reset error:', error);
-        res.status(500).json({ error: 'Failed to reset database' });
-    } finally {
-        connection.release();
-    }
-});
+// Disabled by default; only enabled when ENABLE_DEBUG_ROUTES=true in the environment.
+if (process.env.ENABLE_DEBUG_ROUTES === 'true') {
+    app.post('/api/debug/reset', async (req, res) => {
+        const connection = await pool.getConnection();
+        try {
+            await connection.query('SET FOREIGN_KEY_CHECKS = 0');
+            await connection.query('TRUNCATE TABLE order_items');
+            await connection.query('TRUNCATE TABLE orders');
+            await connection.query('TRUNCATE TABLE users');
+            await connection.query('SET FOREIGN_KEY_CHECKS = 1');
+
+            res.json({ message: 'Database reset successful. Users, orders, and items have been cleared.' });
+        } catch (error) {
+            console.error('Reset error:', error);
+            res.status(500).json({ error: 'Failed to reset database' });
+        } finally {
+            connection.release();
+        }
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`Backend server is running on http://localhost:${PORT}`);

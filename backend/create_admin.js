@@ -17,7 +17,7 @@ async function createAdmin() {
              VALUES (?, ?, ?, ?, ?, ?)`,
             [nim, name, email, hashedPassword, phone_number, role]
         );
-        console.log('Admin user created successfully! NIM: admin, Password: admin');
+        console.log('Admin user created successfully! ID: admin, Password: admin');
     } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
             console.log('Admin user already exists.');
