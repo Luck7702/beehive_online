@@ -129,6 +129,24 @@ class ApiService {
     }
   }
 
+  /// One page of completed (done/cancelled) orders for the worker history view.
+  /// Returns the page's `orders` plus a `hasMore` flag for infinite scrolling.
+  static Future<({List<Map<String, dynamic>> orders, bool hasMore})> getCompletedOrders({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/orders/completed?page=$page&limit=$limit'),
+      headers: _authHeaders,
+    );
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final orders = (data['orders'] as List).cast<Map<String, dynamic>>();
+      return (orders: orders, hasMore: data['hasMore'] == true);
+    }
+    throw Exception('Failed to load completed orders (${response.statusCode})');
+  }
+
   // ============================
   // PLACE ORDER (Student)
   // ============================

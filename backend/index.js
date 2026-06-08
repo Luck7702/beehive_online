@@ -235,16 +235,55 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
     }
 
     try {
+        // The active bulletin shows work-in-progress only. Terminal orders (done /
+        // cancelled) are excluded to keep the payload small as history grows — they
+        // live behind the paginated /completed endpoint. A payment still awaiting
+        // verification always surfaces here, even if its status moved on.
         const [orders] = await pool.query(
             `SELECT o.*, u.name as student_name, u.nim as student_nim
              FROM orders o
              LEFT JOIN users u ON o.user_id = u.id
+             WHERE o.order_status IN ('placed', 'processed')
+                OR o.payment_status = 'awaiting_verification'
              ORDER BY o.created_at DESC`
         );
         res.json(await attachItems(await attachProofUrls(orders)));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+});
+
+// Completed/terminal orders for the worker history view — newest first, paginated
+// so the client pulls one page at a time instead of every past order at once.
+app.get('/api/orders/completed', authenticateToken, async (req, res) => {
+    if (req.user.role !== 'worker') {
+        return res.status(403).json({ error: 'Only workers can view completed orders' });
+    }
+
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 50);
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const offset = (page - 1) * limit;
+
+    try {
+        // Fetch one extra row to tell whether a further page exists, without a
+        // separate COUNT query.
+        const [rows] = await pool.query(
+            `SELECT o.*, u.name as student_name, u.nim as student_nim
+             FROM orders o
+             LEFT JOIN users u ON o.user_id = u.id
+             WHERE o.order_status IN ('done', 'cancelled')
+             ORDER BY o.created_at DESC
+             LIMIT ? OFFSET ?`,
+            [limit + 1, offset]
+        );
+        const hasMore = rows.length > limit;
+        const pageRows = hasMore ? rows.slice(0, limit) : rows;
+        const orders = await attachItems(await attachProofUrls(pageRows));
+        res.json({ orders, page, limit, hasMore });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch completed orders' });
     }
 });
 

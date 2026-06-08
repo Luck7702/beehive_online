@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/time_format.dart';
+import '../widgets/order_card.dart';
 
 class WorkerBulletinScreen extends StatefulWidget {
   const WorkerBulletinScreen({super.key});
@@ -24,60 +25,8 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
     });
   }
 
-  String _nextStatus(String current) {
-    switch (current) {
-      case 'placed':
-        return 'processed';
-      case 'processed':
-        return 'done';
-      default:
-        return current;
-    }
-  }
-
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'placed':
-        return '📋 Placed';
-      case 'processed':
-        return '🔧 Processed';
-      case 'done':
-        return '✅ Done';
-      case 'cancelled':
-        return '❌ Cancelled';
-      default:
-        return status;
-    }
-  }
-
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'placed':
-        return const Color(0xFFF59E0B); // amber
-      case 'processed':
-        return const Color(0xFF3B82F6); // blue
-      case 'done':
-        return const Color(0xFF10B981); // green
-      case 'cancelled':
-        return const Color(0xFFEF4444); // red
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _actionButtonLabel(String status) {
-    switch (status) {
-      case 'placed':
-        return 'Start Processing';
-      case 'processed':
-        return 'Mark as Done';
-      default:
-        return '';
-    }
-  }
-
   Future<void> _advanceOrder(int orderId, String currentStatus) async {
-    final next = _nextStatus(currentStatus);
+    final next = OrderCard.nextStatus(currentStatus);
     final success = await ApiService.updateOrderStatus(orderId, next);
 
     if (!mounted) return;
@@ -85,7 +34,7 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Order #$orderId updated to ${_statusLabel(next)}'),
+          content: Text('Order #$orderId updated to ${OrderCard.statusLabel(next)}'),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 1),
         ),
@@ -198,71 +147,81 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
                 ],
               ),
             );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('No orders yet', style: TextStyle(fontSize: 18, color: Colors.grey)),
-                ],
-              ),
-            );
           }
 
-          final orders = snapshot.data!;
+          // Active orders only (done/cancelled live in the completed history).
+          final orders = snapshot.data ?? const [];
 
           // Group orders by status for bulletin layout
           final awaitingVerification = orders.where((o) => o['payment_status'] == 'awaiting_verification').toList();
           final placedOrders = orders.where((o) => o['order_status'] == 'placed').toList();
           final processedOrders = orders.where((o) => o['order_status'] == 'processed').toList();
-          final doneOrders = orders.where((o) => o['order_status'] == 'done').toList();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Summary cards
-                Row(
-                  children: [
-                    _buildSummaryCard('Placed', placedOrders.length, const Color(0xFFF59E0B)),
-                    const SizedBox(width: 12),
-                    _buildSummaryCard('Processing', processedOrders.length, const Color(0xFF3B82F6)),
-                    const SizedBox(width: 12),
-                    _buildSummaryCard('Done', doneOrders.length, const Color(0xFF10B981)),
+          return RefreshIndicator(
+            onRefresh: () async => _refreshOrders(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Summary cards
+                  Row(
+                    children: [
+                      _buildSummaryCard('Placed', placedOrders.length, const Color(0xFFF59E0B)),
+                      const SizedBox(width: 12),
+                      _buildSummaryCard('Processing', processedOrders.length, const Color(0xFF3B82F6)),
+                      const SizedBox(width: 12),
+                      _buildNavCard('Completed', Icons.history, const Color(0xFF10B981),
+                          () => Navigator.pushNamed(context, '/worker_history')),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  if (orders.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 80),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
+                            SizedBox(height: 16),
+                            Text('No active orders', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                            SizedBox(height: 4),
+                            Text('Completed orders appear in history.',
+                                style: TextStyle(fontSize: 13, color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  if (awaitingVerification.isNotEmpty) ...[
+                    _buildSectionHeader('🔍 Payment Verifications', awaitingVerification.length),
+                    const SizedBox(height: 8),
+                    ...awaitingVerification.map((o) => _buildVerificationCard(o)),
+                    const SizedBox(height: 24),
                   ],
-                ),
-                const SizedBox(height: 24),
 
-                if (awaitingVerification.isNotEmpty) ...[
-                  _buildSectionHeader('🔍 Payment Verifications', awaitingVerification.length),
-                  const SizedBox(height: 8),
-                  ...awaitingVerification.map((o) => _buildVerificationCard(o)),
-                  const SizedBox(height: 24),
-                ],
+                  if (placedOrders.isNotEmpty) ...[
+                    _buildSectionHeader('📋 New Orders', placedOrders.length),
+                    const SizedBox(height: 8),
+                    ...placedOrders.map((o) => OrderCard(
+                          order: o,
+                          onAdvance: () => _advanceOrder(o['id'] as int, o['order_status'] as String),
+                        )),
+                    const SizedBox(height: 24),
+                  ],
 
-                if (placedOrders.isNotEmpty) ...[
-                  _buildSectionHeader('📋 New Orders', placedOrders.length),
-                  const SizedBox(height: 8),
-                  ...placedOrders.map((o) => _buildOrderCard(o)),
-                  const SizedBox(height: 24),
+                  if (processedOrders.isNotEmpty) ...[
+                    _buildSectionHeader('🔧 Being Processed', processedOrders.length),
+                    const SizedBox(height: 8),
+                    ...processedOrders.map((o) => OrderCard(
+                          order: o,
+                          onAdvance: () => _advanceOrder(o['id'] as int, o['order_status'] as String),
+                        )),
+                  ],
                 ],
-
-                if (processedOrders.isNotEmpty) ...[
-                  _buildSectionHeader('🔧 Being Processed', processedOrders.length),
-                  const SizedBox(height: 8),
-                  ...processedOrders.map((o) => _buildOrderCard(o)),
-                  const SizedBox(height: 24),
-                ],
-
-                if (doneOrders.isNotEmpty) ...[
-                  _buildSectionHeader('✅ Completed', doneOrders.length),
-                  const SizedBox(height: 8),
-                  ...doneOrders.map((o) => _buildOrderCard(o)),
-                ],
-              ],
+              ),
             ),
           );
         },
@@ -285,6 +244,30 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
             const SizedBox(height: 4),
             Text(title, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
           ],
+        ),
+      ),
+    );
+  }
+
+  // Like a summary card but tappable — a shortcut into another screen.
+  Widget _buildNavCard(String title, IconData icon, Color color, VoidCallback onTap) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 26),
+              const SizedBox(height: 6),
+              Text(title, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
+            ],
+          ),
         ),
       ),
     );
@@ -373,167 +356,6 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
                 ),
               ],
             )
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Renders the line items (product + quantity + line subtotal) for an order.
-  // This is the core of the bulletin: it tells the worker what to prepare.
-  Widget _buildOrderItems(Map<String, dynamic> order) {
-    final items = (order['items'] as List?) ?? const [];
-    if (items.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 12),
-        child: Text(
-          'No item details available for this order.',
-          style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
-        const Divider(height: 1),
-        const SizedBox(height: 10),
-        const Text('Items', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-        const SizedBox(height: 8),
-        ...items.map((raw) {
-          final item = raw as Map<String, dynamic>;
-          final qty = (item['quantity'] as num?)?.toInt() ?? 0;
-          final unit = (item['price_at_purchase'] as num?)?.toInt() ?? 0;
-          final name = item['product_name']?.toString() ?? 'Unknown item';
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '$qty×',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFFB45309)),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(child: Text(name, style: const TextStyle(fontSize: 14))),
-                Text('Rp ${unit * qty}', style: const TextStyle(color: Colors.grey, fontSize: 13)),
-              ],
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  Widget _buildOrderCard(Map<String, dynamic> order) {
-    final status = order['order_status'] as String;
-    final orderId = order['id'] as int;
-    final studentName = order['student_name'] ?? 'Unknown';
-    final studentNim = order['student_nim'] ?? '';
-    final building = order['delivery_building'] ?? '';
-    final floor = order['delivery_floor'] ?? '';
-    final room = order['delivery_room'] ?? '';
-    final totalPrice = order['total_price'] ?? 0;
-    final canAdvance = status == 'placed' || status == 'processed';
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Order #$orderId', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _statusColor(status).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _statusLabel(status),
-                    style: TextStyle(color: _statusColor(status), fontWeight: FontWeight.w600, fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            // Order time
-            Row(
-              children: [
-                const Icon(Icons.schedule, size: 16, color: Colors.grey),
-                const SizedBox(width: 6),
-                Text(
-                  '${formatDateTime(order['created_at'])}  ·  ${timeAgo(order['created_at'])}',
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-
-            // Student info
-            Row(
-              children: [
-                const Icon(Icons.person_outline, size: 16, color: Colors.grey),
-                const SizedBox(width: 6),
-                Text('$studentName ($studentNim)', style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
-            const SizedBox(height: 6),
-
-            // Delivery location
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 6),
-                Text('$building, Floor $floor, Room $room', style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
-            const SizedBox(height: 6),
-
-            // Total
-            Row(
-              children: [
-                const Icon(Icons.payments_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 6),
-                Text('Rp $totalPrice', style: const TextStyle(fontWeight: FontWeight.w600)),
-              ],
-            ),
-
-            // Ordered items — what the worker actually needs to prepare
-            _buildOrderItems(order),
-
-            // Action button
-            if (canAdvance) ...[
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _advanceOrder(orderId, status),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _statusColor(_nextStatus(status)),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text(_actionButtonLabel(status), style: const TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
           ],
         ),
       ),
