@@ -379,6 +379,60 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
     );
   }
 
+  // Renders the line items (product + quantity + line subtotal) for an order.
+  // This is the core of the bulletin: it tells the worker what to prepare.
+  Widget _buildOrderItems(Map<String, dynamic> order) {
+    final items = (order['items'] as List?) ?? const [];
+    if (items.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 12),
+        child: Text(
+          'No item details available for this order.',
+          style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 13),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        const Divider(height: 1),
+        const SizedBox(height: 10),
+        const Text('Items', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const SizedBox(height: 8),
+        ...items.map((raw) {
+          final item = raw as Map<String, dynamic>;
+          final qty = (item['quantity'] as num?)?.toInt() ?? 0;
+          final unit = (item['price_at_purchase'] as num?)?.toInt() ?? 0;
+          final name = item['product_name']?.toString() ?? 'Unknown item';
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$qty×',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFFB45309)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(child: Text(name, style: const TextStyle(fontSize: 14))),
+                Text('Rp ${unit * qty}', style: const TextStyle(color: Colors.grey, fontSize: 13)),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   Widget _buildOrderCard(Map<String, dynamic> order) {
     final status = order['order_status'] as String;
     final orderId = order['id'] as int;
@@ -459,6 +513,9 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
                 Text('Rp $totalPrice', style: const TextStyle(fontWeight: FontWeight.w600)),
               ],
             ),
+
+            // Ordered items — what the worker actually needs to prepare
+            _buildOrderItems(order),
 
             // Action button
             if (canAdvance) ...[

@@ -79,6 +79,29 @@ async function attachProofUrls(orders) {
     })));
 }
 
+// Attach each order's line items (with product name) under an `items` array so
+// clients can show WHAT was ordered, not just the total. Done in one batched
+// query for all the given orders, then grouped in memory by order_id.
+async function attachItems(orders) {
+    if (orders.length === 0) return orders;
+    const orderIds = orders.map((o) => o.id);
+    const [rows] = await pool.query(
+        `SELECT oi.order_id, oi.product_id, oi.quantity, oi.price_at_purchase,
+                p.name AS product_name, p.image_url
+           FROM order_items oi
+           JOIN products p ON p.id = oi.product_id
+          WHERE oi.order_id IN (?)
+          ORDER BY oi.id ASC`,
+        [orderIds]
+    );
+    const byOrder = new Map();
+    for (const row of rows) {
+        if (!byOrder.has(row.order_id)) byOrder.set(row.order_id, []);
+        byOrder.get(row.order_id).push(row);
+    }
+    return orders.map((o) => ({ ...o, items: byOrder.get(o.id) || [] }));
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -213,12 +236,12 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
 
     try {
         const [orders] = await pool.query(
-            `SELECT o.*, u.name as student_name, u.nim as student_nim 
-             FROM orders o 
-             LEFT JOIN users u ON o.user_id = u.id 
+            `SELECT o.*, u.name as student_name, u.nim as student_nim
+             FROM orders o
+             LEFT JOIN users u ON o.user_id = u.id
              ORDER BY o.created_at DESC`
         );
-        res.json(await attachProofUrls(orders));
+        res.json(await attachItems(await attachProofUrls(orders)));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch orders' });
