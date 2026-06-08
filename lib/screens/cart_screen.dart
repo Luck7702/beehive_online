@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../theme.dart';
 import '../providers/cart_provider.dart';
 
 class CartScreen extends StatelessWidget {
@@ -65,12 +66,12 @@ class CartScreen extends StatelessWidget {
                         child: Card(
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                              child: Icon(Icons.fastfood, color: Theme.of(context).primaryColor),
+                            leading: const CircleAvatar(
+                              backgroundColor: BeehiveColors.honeyTint,
+                              child: Icon(Icons.fastfood, color: BeehiveColors.honeyDark),
                             ),
                             title: Text(item.product.name),
-                            subtitle: Text(item.product.formattedPrice),
+                            subtitle: Text(item.product.formattedPrice, style: const TextStyle(color: BeehiveColors.honeyDark, fontWeight: FontWeight.w600)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -109,8 +110,8 @@ class CartScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total Payment', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                    Text('Rp ${cart.totalAmount}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
+                    const Text('Total Payment', style: TextStyle(fontSize: 16, color: BeehiveColors.muted)),
+                    Text('Rp ${cart.totalAmount}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: BeehiveColors.ink)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -118,14 +119,7 @@ class CartScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: cartItems.isEmpty ? null : () => Navigator.pushNamed(context, '/checkout'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey[700],
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: const Text('Proceed to Checkout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    child: const Text('Proceed to Checkout'),
                   ),
                 ),
               ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -13,64 +14,49 @@ class WelcomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              // App Logo (Coming Soon)
+              // Brand logo
               Container(
-                width: 160,
-                height: 160,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF1F3F4),
+                width: 132,
+                height: 132,
+                decoration: BoxDecoration(
+                  color: BeehiveColors.honey,
                   shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.storefront_outlined, size: 60, color: Theme.of(context).primaryColor),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'App Logo\n(Coming Soon)',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: BeehiveColors.honey.withValues(alpha: 0.35),
+                      blurRadius: 28,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
+                alignment: Alignment.center,
+                child: const Icon(Icons.hive_rounded, size: 72, color: BeehiveColors.ink),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
               const Text(
-                'Welcome to UniMart',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
+                'BeeHive Online',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: BeehiveColors.ink),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Campus essentials, delivered to your room.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: BeehiveColors.muted, height: 1.4),
               ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, '/login_form'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    elevation: 0,
-                  ),
-                  child: const Text('Log In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text('Log In'),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => Navigator.pushNamed(context, '/signup'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor, width: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  child: const Text('Sign Up', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text('Sign Up'),
                 ),
               ),
               const SizedBox(height: 32),

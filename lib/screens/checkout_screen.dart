@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../theme.dart';
 import '../providers/cart_provider.dart';
 import '../services/api_service.dart';
 
@@ -181,10 +182,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _buildingController,
-              decoration: InputDecoration(
-                labelText: 'Building / Gedung',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+              decoration: const InputDecoration(labelText: 'Building / Gedung'),
             ),
             const SizedBox(height: 16),
             Row(
@@ -192,11 +190,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Expanded(
                   child: TextField(
                     controller: _floorController,
-                    decoration: InputDecoration(
-                      labelText: 'Floor / Lantai',
-                      hintText: 'e.g., 3',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
+                    decoration: const InputDecoration(labelText: 'Floor / Lantai', hintText: 'e.g., 3'),
                     keyboardType: TextInputType.number,
                   ),
                 ),
@@ -204,11 +198,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Expanded(
                   child: TextField(
                     controller: _roomController,
-                    decoration: InputDecoration(
-                      labelText: 'Room / Ruangan',
-                      hintText: 'e.g., 302',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
+                    decoration: const InputDecoration(labelText: 'Room / Ruangan', hintText: 'e.g., 302'),
                   ),
                 ),
               ],
@@ -218,8 +208,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: BeehiveColors.border),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: RadioGroup<String>(
                 groupValue: _paymentMethod,
@@ -274,15 +264,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _confirmOrder,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: _isLoading 
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text('Place Order ($_paymentMethod)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: _isLoading
+                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: BeehiveColors.ink, strokeWidth: 2))
+                  : Text('Place Order ($_paymentMethod)'),
               ),
             ),
           ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'theme.dart';
 import 'providers/cart_provider.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
@@ -27,21 +28,9 @@ class CampusMinimartApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
-        title: 'Beehive Online',
+        title: 'BeeHive Online',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData.light().copyWith(
-          scaffoldBackgroundColor: Colors.white,
-          primaryColor: const Color(0xFF1A73E8),
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF1A73E8),
-            secondary: Color(0xFFF1F3F4),
-            surface: Colors.white,
-          ),
-          cardTheme: const CardThemeData(
-            color: Color(0xFFF8F9FA),
-            elevation: 0,
-          ),
-        ),
+        theme: buildBeehiveTheme(),
         initialRoute: '/welcome',
         routes: {
           '/welcome': (context) => const WelcomeScreen(),

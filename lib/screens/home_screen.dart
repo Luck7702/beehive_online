@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../theme.dart';
 import '../models/product.dart';
 import '../services/api_service.dart';
 import '../providers/cart_provider.dart';
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('UniMart Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('BeeHive Online', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -158,15 +159,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFFC851), BeehiveColors.honey],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text('✨ Free Delivery This Week!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                    SizedBox(height: 4),
-                    Text('No minimum checkout order for any building floor.', style: TextStyle(color: Colors.white70)),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Free Delivery This Week!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: BeehiveColors.ink)),
+                          SizedBox(height: 4),
+                          Text('No minimum order to any building or floor.', style: TextStyle(color: Color(0xCC2A2521))),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.local_shipping_rounded, color: BeehiveColors.ink),
+                    ),
                   ],
                 ),
               ),
@@ -175,16 +195,9 @@ class _HomeScreenState extends State<HomeScreen> {
               // Search bar
               TextField(
                 onChanged: (value) => setState(() => _searchQuery = value),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Search products...',
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: const Color(0xFFF1F3F4),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
+                  prefixIcon: Icon(Icons.search, color: BeehiveColors.muted),
                 ),
               ),
               const SizedBox(height: 20),
@@ -204,8 +217,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ChoiceChip(
                         label: Text(_categoryLabel(cat)),
                         selected: isSelected,
-                        selectedColor: Theme.of(context).primaryColor,
-                        labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
+                        labelStyle: TextStyle(
+                          color: BeehiveColors.ink,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        showCheckmark: false,
                         onSelected: (_) => setState(() => _selectedCategory = cat),
                       ),
                     );
@@ -287,16 +303,16 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8),
+                  color: BeehiveColors.honeyTint,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.fastfood_outlined, size: 40, color: Theme.of(context).primaryColor),
+                child: const Icon(Icons.fastfood_outlined, size: 40, color: BeehiveColors.honeyDark),
               ),
             ),
             const SizedBox(height: 8),
             Text(prod.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 4),
-            Text(prod.formattedPrice, style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.w600)),
+            Text(prod.formattedPrice, style: const TextStyle(color: BeehiveColors.honeyDark, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
@@ -311,12 +327,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                ),
-                child: const Text('Add to Cart', style: TextStyle(fontSize: 12)),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 8)),
+                child: const Text('Add to Cart', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             )
           ],
