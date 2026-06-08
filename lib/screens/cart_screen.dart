@@ -67,11 +67,11 @@ class CartScreen extends StatelessWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: ListTile(
                             leading: const CircleAvatar(
-                              backgroundColor: BeehiveColors.honeyTint,
-                              child: Icon(Icons.fastfood, color: BeehiveColors.honeyDark),
+                              backgroundColor: BeehiveColors.blueTint,
+                              child: Icon(Icons.fastfood, color: BeehiveColors.blue),
                             ),
                             title: Text(item.product.name),
-                            subtitle: Text(item.product.formattedPrice, style: const TextStyle(color: BeehiveColors.honeyDark, fontWeight: FontWeight.w600)),
+                            subtitle: Text(item.product.formattedPrice, style: const TextStyle(color: BeehiveColors.blue, fontWeight: FontWeight.w600)),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [

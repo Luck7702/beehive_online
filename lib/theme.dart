@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
 
-/// Central brand palette for Beehive Online.
-/// Bee/honey identity: warm honey amber accents on a charcoal "hive ink".
+/// Central brand palette for BeeHive Online.
+/// Blue + white identity, with bee yellow used only as a small accent.
 class BeehiveColors {
-  static const Color honey = Color(0xFFF6A609); // primary accent / fills
-  static const Color honeyDark = Color(0xFFB45309); // accent text on light bg (accessible)
-  static const Color honeyTint = Color(0xFFFFF3DC); // soft honey surface
-  static const Color ink = Color(0xFF2A2521); // primary text / dark actions
-  static const Color cream = Color(0xFFFFFCF6); // app background
-  static const Color field = Color(0xFFF3EEE4); // input fill
-  static const Color border = Color(0xFFEFE7D6); // hairline borders
-  static const Color muted = Color(0xFF8A8178); // secondary text
+  static const Color blue = Color(0xFF1A73E8); // primary accent
+  static const Color blueDark = Color(0xFF1557B0); // gradients / pressed
+  static const Color blueTint = Color(0xFFE8F1FE); // soft blue surface
+  static const Color yellow = Color(0xFFFFC107); // bee accent — use sparingly
+  static const Color ink = Color(0xFF1F2A37); // primary text
+  static const Color muted = Color(0xFF6B7280); // secondary text
+  static const Color bg = Color(0xFFF7F9FC); // app background (near white)
+  static const Color field = Color(0xFFEFF3F9); // input fill
+  static const Color border = Color(0xFFE3E8EF); // hairline borders
 }
 
 ThemeData buildBeehiveTheme() {
   final base = ThemeData.light(useMaterial3: true);
 
   return base.copyWith(
-    scaffoldBackgroundColor: BeehiveColors.cream,
-    primaryColor: BeehiveColors.honey,
+    scaffoldBackgroundColor: BeehiveColors.bg,
+    primaryColor: BeehiveColors.blue,
     colorScheme: base.colorScheme.copyWith(
-      primary: BeehiveColors.honey,
-      onPrimary: BeehiveColors.ink,
-      secondary: BeehiveColors.ink,
+      primary: BeehiveColors.blue,
+      onPrimary: Colors.white,
+      secondary: BeehiveColors.blue,
       onSecondary: Colors.white,
       surface: Colors.white,
       onSurface: BeehiveColors.ink,
@@ -69,15 +70,15 @@ ThemeData buildBeehiveTheme() {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: BeehiveColors.honey, width: 1.6),
+        borderSide: const BorderSide(color: BeehiveColors.blue, width: 1.6),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: BeehiveColors.honey,
-        foregroundColor: BeehiveColors.ink,
-        disabledBackgroundColor: const Color(0xFFE7E0D4),
-        disabledForegroundColor: BeehiveColors.muted,
+        backgroundColor: BeehiveColors.blue,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: const Color(0xFFD7DEE8),
+        disabledForegroundColor: Colors.white,
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 16),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -86,8 +87,8 @@ ThemeData buildBeehiveTheme() {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: BeehiveColors.ink,
-        side: const BorderSide(color: BeehiveColors.ink, width: 1.5),
+        foregroundColor: BeehiveColors.blue,
+        side: const BorderSide(color: BeehiveColors.blue, width: 1.5),
         padding: const EdgeInsets.symmetric(vertical: 16),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -95,7 +96,7 @@ ThemeData buildBeehiveTheme() {
     ),
     chipTheme: base.chipTheme.copyWith(
       backgroundColor: Colors.white,
-      selectedColor: BeehiveColors.honey,
+      selectedColor: BeehiveColors.blue,
       side: const BorderSide(color: BeehiveColors.border),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),

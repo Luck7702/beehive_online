@@ -99,6 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
               label: Text(cart.itemCount.toString()),
+              backgroundColor: BeehiveColors.yellow,
+              textColor: BeehiveColors.ink,
               isLabelVisible: cart.itemCount > 0,
               child: ch!,
             ),
@@ -160,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFFC851), BeehiveColors.honey],
+                    colors: [BeehiveColors.blue, BeehiveColors.blueDark],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -172,20 +174,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Free Delivery This Week!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: BeehiveColors.ink)),
+                          Text('Free Delivery This Week!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                           SizedBox(height: 4),
-                          Text('No minimum order to any building or floor.', style: TextStyle(color: Color(0xCC2A2521))),
+                          Text('No minimum order to any building or floor.', style: TextStyle(color: Colors.white70)),
                         ],
                       ),
                     ),
                     Container(
                       width: 52,
                       height: 52,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.35),
+                      decoration: const BoxDecoration(
+                        color: BeehiveColors.yellow,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.local_shipping_rounded, color: BeehiveColors.ink),
+                      child: const Icon(Icons.local_shipping_rounded, color: BeehiveColors.blue),
                     ),
                   ],
                 ),
@@ -218,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         label: Text(_categoryLabel(cat)),
                         selected: isSelected,
                         labelStyle: TextStyle(
-                          color: BeehiveColors.ink,
+                          color: isSelected ? Colors.white : BeehiveColors.ink,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                         showCheckmark: false,
@@ -303,16 +305,16 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: BeehiveColors.honeyTint,
+                  color: BeehiveColors.blueTint,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.fastfood_outlined, size: 40, color: BeehiveColors.honeyDark),
+                child: const Icon(Icons.fastfood_outlined, size: 40, color: BeehiveColors.blue),
               ),
             ),
             const SizedBox(height: 8),
             Text(prod.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 4),
-            Text(prod.formattedPrice, style: const TextStyle(color: BeehiveColors.honeyDark, fontWeight: FontWeight.bold)),
+            Text(prod.formattedPrice, style: const TextStyle(color: BeehiveColors.blue, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,

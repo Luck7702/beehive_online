@@ -265,7 +265,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _confirmOrder,
                 child: _isLoading
-                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: BeehiveColors.ink, strokeWidth: 2))
+                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                   : Text('Place Order ($_paymentMethod)'),
               ),
             ),

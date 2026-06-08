@@ -19,18 +19,18 @@ class WelcomeScreen extends StatelessWidget {
                 width: 132,
                 height: 132,
                 decoration: BoxDecoration(
-                  color: BeehiveColors.honey,
+                  color: BeehiveColors.blue,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: BeehiveColors.honey.withValues(alpha: 0.35),
+                      color: BeehiveColors.blue.withValues(alpha: 0.30),
                       blurRadius: 28,
                       offset: const Offset(0, 10),
                     ),
                   ],
                 ),
                 alignment: Alignment.center,
-                child: const Icon(Icons.hive_rounded, size: 72, color: BeehiveColors.ink),
+                child: const Icon(Icons.hive_rounded, size: 72, color: BeehiveColors.yellow),
               ),
               const SizedBox(height: 32),
               const Text(
