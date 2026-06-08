@@ -16,9 +16,16 @@ class BeehiveColors {
   static const Color success = Color(0xFF10B981);
   static const Color danger = Color(0xFFEF4444);
 
-  /// Brand gradient for hero surfaces (banners, logo, headers).
+  /// Brand gradient for hero surfaces (banners, headers).
   static const LinearGradient brandGradient = LinearGradient(
     colors: [Color(0xFF2B86F0), blueDark],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// Warm honey gradient used by the brand logo.
+  static const LinearGradient honeyGradient = LinearGradient(
+    colors: [Color(0xFFFFD24D), Color(0xFFF59E0B)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

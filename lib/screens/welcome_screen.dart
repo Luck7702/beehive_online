@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../widgets/beehive_logo.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -14,23 +15,7 @@ class WelcomeScreen extends StatelessWidget {
             children: [
               const Spacer(),
               // Brand logo
-              Container(
-                width: 128,
-                height: 128,
-                decoration: BoxDecoration(
-                  gradient: BeehiveColors.brandGradient,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: BeehiveColors.blue.withValues(alpha: 0.35),
-                      blurRadius: 36,
-                      offset: const Offset(0, 16),
-                    ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.hive_rounded, size: 68, color: Colors.white),
-              ),
+              const BeehiveLogo(size: 132),
               const SizedBox(height: 36),
               const Text(
                 'BeeHive Online',
