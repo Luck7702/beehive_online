@@ -158,41 +158,57 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Promo banner
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [BeehiveColors.blue, BeehiveColors.blueDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Free Delivery This Week!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                          SizedBox(height: 4),
-                          Text('No minimum order to any building or floor.', style: TextStyle(color: Colors.white70)),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 52,
-                      height: 52,
-                      decoration: const BoxDecoration(
-                        color: BeehiveColors.yellow,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.local_shipping_rounded, color: BeehiveColors.blue),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: BeehiveColors.blue.withValues(alpha: 0.28),
+                      blurRadius: 24,
+                      offset: const Offset(0, 12),
                     ),
                   ],
                 ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(gradient: BeehiveColors.brandGradient),
+                    child: Stack(
+                      children: [
+                        // Soft decorative circles for depth
+                        Positioned(right: -24, top: -28, child: _decorCircle(110, 0.12)),
+                        Positioned(right: 48, bottom: -40, child: _decorCircle(96, 0.08)),
+                        Padding(
+                          padding: const EdgeInsets.all(22),
+                          child: Row(
+                            children: [
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Free Delivery This Week!',
+                                        style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -0.3)),
+                                    SizedBox(height: 6),
+                                    Text('No minimum order to any building or floor.',
+                                        style: TextStyle(color: Colors.white70, height: 1.4)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 54,
+                                height: 54,
+                                decoration: const BoxDecoration(color: BeehiveColors.yellow, shape: BoxShape.circle),
+                                child: const Icon(Icons.local_shipping_rounded, color: BeehiveColors.blueDark),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
               // Search bar
               TextField(
@@ -241,6 +257,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  // Faint translucent circle used to add depth to the promo banner.
+  Widget _decorCircle(double size, double opacity) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: opacity),
+          shape: BoxShape.circle,
+        ),
+      );
 
   Widget _buildProductsSection() {
     if (_isLoading) {
@@ -330,11 +356,11 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Text(prod.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 4),
-            Text(prod.formattedPrice, style: const TextStyle(color: BeehiveColors.blue, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            Text(prod.formattedPrice, style: const TextStyle(color: BeehiveColors.blue, fontWeight: FontWeight.bold, fontSize: 15)),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 onPressed: () {
                   Provider.of<CartProvider>(context, listen: false).addItem(prod);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -345,8 +371,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 8)),
-                child: const Text('Add to Cart', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  textStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                ),
+                icon: const Icon(Icons.add_shopping_cart, size: 16),
+                label: const Text('Add to Cart'),
               ),
             )
           ],

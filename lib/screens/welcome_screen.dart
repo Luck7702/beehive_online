@@ -11,37 +11,41 @@ class WelcomeScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(28.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
               // Brand logo
               Container(
-                width: 132,
-                height: 132,
+                width: 128,
+                height: 128,
                 decoration: BoxDecoration(
-                  color: BeehiveColors.blue,
+                  gradient: BeehiveColors.brandGradient,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: BeehiveColors.blue.withValues(alpha: 0.30),
-                      blurRadius: 28,
-                      offset: const Offset(0, 10),
+                      color: BeehiveColors.blue.withValues(alpha: 0.35),
+                      blurRadius: 36,
+                      offset: const Offset(0, 16),
                     ),
                   ],
                 ),
                 alignment: Alignment.center,
-                child: const Icon(Icons.hive_rounded, size: 72, color: BeehiveColors.yellow),
+                child: const Icon(Icons.hive_rounded, size: 68, color: Colors.white),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 36),
               const Text(
                 'BeeHive Online',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: BeehiveColors.ink),
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: BeehiveColors.ink,
+                  letterSpacing: -0.5,
+                ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               const Text(
-                'Campus essentials, delivered to your room.',
+                'Campus essentials, delivered\nstraight to your room.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, color: BeehiveColors.muted, height: 1.4),
+                style: TextStyle(fontSize: 16, color: BeehiveColors.muted, height: 1.5),
               ),
               const Spacer(),
               SizedBox(
@@ -59,7 +63,7 @@ class WelcomeScreen extends StatelessWidget {
                   child: const Text('Sign Up'),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
             ],
           ),
         ),

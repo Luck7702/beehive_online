@@ -52,10 +52,21 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: BeehiveColors.brandGradient,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: BeehiveColors.softShadow,
+                ),
+                child: const Icon(Icons.hive_rounded, color: Colors.white, size: 30),
+              ),
+              const SizedBox(height: 24),
               const Text(
                 'Welcome back',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: BeehiveColors.ink),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: BeehiveColors.ink, letterSpacing: -0.5),
               ),
               const SizedBox(height: 8),
               const Text(

@@ -46,6 +46,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     }
   }
 
+  Widget _statusPill(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,21 +122,26 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Text('Order Status', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                    Text(
+                                    const SizedBox(height: 4),
+                                    _statusPill(
                                       order['order_status'].toString().toUpperCase(),
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: _getStatusColor(order['order_status'])),
+                                      _getStatusColor(order['order_status']),
                                     ),
                                   ],
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    const Text('Payment', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                    Text(
-                                      '${order['payment_method']} - ${order['payment_status']}'.toUpperCase(),
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: _getStatusColor(order['payment_status'])),
-                                    ),
-                                  ],
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      const Text('Payment', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${order['payment_method']} · ${order['payment_status']}'.toUpperCase(),
+                                        textAlign: TextAlign.end,
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: _getStatusColor(order['payment_status'])),
+                                      ),
+                                    ],
+                                  ),
                                 )
                               ],
                             )

@@ -7,6 +7,18 @@ import '../services/api_service.dart';
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
+  // Compact +/- control used in the quantity stepper.
+  Widget _qtyButton(IconData icon, VoidCallback onPressed) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Icon(icon, size: 18, color: BeehiveColors.blue),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
@@ -78,19 +90,23 @@ class CartScreen extends StatelessWidget {
                             ),
                             title: Text(item.product.name),
                             subtitle: Text(item.product.formattedPrice, style: const TextStyle(color: BeehiveColors.blue, fontWeight: FontWeight.w600)),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  onPressed: () => cart.decreaseQuantity(productId),
-                                ),
-                                Text('${item.quantity}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                IconButton(
-                                  icon: const Icon(Icons.add_circle_outline),
-                                  onPressed: () => cart.addItem(item.product),
-                                ),
-                              ],
+                            trailing: Container(
+                              decoration: BoxDecoration(
+                                color: BeehiveColors.blueTint,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _qtyButton(Icons.remove, () => cart.decreaseQuantity(productId)),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                                    child: Text('${item.quantity}',
+                                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: BeehiveColors.ink)),
+                                  ),
+                                  _qtyButton(Icons.add, () => cart.addItem(item.product)),
+                                ],
+                              ),
                             ),
                           ),
                         ),
