@@ -15,12 +15,23 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'beehive_super_secret_key';
 
 // AWS S3 Configuration
+//
+// Only pass static credentials when AWS_ACCESS_KEY_ID/SECRET are actually set
+// (e.g. for local development). On EC2, leave them unset and attach an IAM role
+// to the instance instead — omitting `credentials` lets the SDK's default
+// provider chain discover the role automatically via the instance metadata
+// service. Passing a `credentials` object (even with placeholder values) would
+// override that chain and break role-based auth.
 const s3Client = new S3Client({
     region: process.env.AWS_REGION || 'ap-southeast-1',
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'dummy',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'dummy',
-    }
+    ...(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+        ? {
+              credentials: {
+                  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+              },
+          }
+        : {}),
 });
 const S3_BUCKET = process.env.AWS_S3_BUCKET || 'beehive-payment-proofs';
 const S3_REGION = process.env.AWS_REGION || 'ap-southeast-1';
