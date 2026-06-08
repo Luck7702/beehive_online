@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../utils/time_format.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -83,9 +84,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text('Order #${order['id']}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                Text(
-                                  order['created_at'] != null ? order['created_at'].toString().substring(0, 10) : '',
-                                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      formatDateTime(order['created_at']),
+                                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                    ),
+                                    Text(
+                                      timeAgo(order['created_at']),
+                                      style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

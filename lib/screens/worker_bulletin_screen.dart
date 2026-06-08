@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../utils/time_format.dart';
 
 class WorkerBulletinScreen extends StatefulWidget {
   const WorkerBulletinScreen({super.key});
@@ -312,6 +313,17 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
             Text('Verify QRIS Payment - Order #$orderId', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             Text('From: $studentName', style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.schedule, size: 14, color: Colors.grey),
+                const SizedBox(width: 6),
+                Text(
+                  '${formatDateTime(order['created_at'])}  ·  ${timeAgo(order['created_at'])}',
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             if (proofUrl != null)
               Center(
@@ -404,7 +416,20 @@ class _WorkerBulletinScreenState extends State<WorkerBulletinScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+
+            // Order time
+            Row(
+              children: [
+                const Icon(Icons.schedule, size: 16, color: Colors.grey),
+                const SizedBox(width: 6),
+                Text(
+                  '${formatDateTime(order['created_at'])}  ·  ${timeAgo(order['created_at'])}',
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
 
             // Student info
             Row(
